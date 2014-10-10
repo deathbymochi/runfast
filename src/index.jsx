@@ -1,26 +1,25 @@
 /** @jsx React.DOM **/
-var React = require('react');
+var React = require('react'),
+pajamas = require('pajamas'),
+$ = require('jquery');
 
 var Sprint = React.createClass({
-    getDefaultProps: function() {
-	return({
-	    data: [
-{"Id":1,"Start":"20140101000000","End":"20140109000000","Teams":[{"Id":1,"Name":"Red","SprintId":"1","Stories":[{"Id":1,"Name":"Omnibox","TeamId":"1","Tasks":[{"Id":1,"Title":"","AssignedTo":{"Id":1,"Name":"Tiffany","CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"2014-10-10T01:23:33Z"},"UserId":"1","StoryId":"1","Total":"6","Remaining":"4","Status":"","CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"},{"Id":2,"Name":"Maps","TeamId":"1","Tasks":null,"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"},{"Id":2,"Name":"Blue","SprintId":"1","Stories":[{"Id":3,"Name":"Sponsors","TeamId":"2","Tasks":null,"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}
-	    ]
-	});
-    },
     getInitialState: function() {
 	var currentSprintId = 1;
+	var data = this.props.data.filter(function(d){return d.Id === currentSprintId})[0];
 	return ({
-	    data: this.props.data,
-	    currentTeamId: this.props.data[0].Id,
-	    currentSprintId: currentSprintId,
-	    stories: []
+	    stories: data,
+	    currentTeamId: data.Teams[0].Id,
+	    currentSprintId: currentSprintId
 	});
     },
     addNewStory: function(event) {
-	var currStories = this.state.stories;
-	var blankStory = {name: 'New story'};
+	var currentTeamId = this.state.currentTeamId;
+	var currStories = this.state.stories.Teams[currentTeamId].Stories;
+	var blankStory = {
+	    "Id": 1,
+	    "Title": ""
+	};
 	this.setState({stories: currStories.concat(blankStory)})
     },
     handleChange: function(event, index) {
@@ -58,9 +57,11 @@ var Sprint = React.createClass({
     elementSprintTeamButtons: function() {
 	var that = this;
 	return (
-	    this.state.data.map(function(d) {
+	    this.state.stories.Teams.map(function(d) {
 		return(
-		    <div className="select-team button" key={d.Id} onClick={function(e) {that.selectSprintTeam(e, d.Id)}} />
+		    <div className="select-team button" key={d.Id} onClick={function(e) {that.selectSprintTeam(e, d.Id)}}>
+		    Sprint {d.Id}
+		    </div>
 		)
 	    })
 	);
@@ -70,17 +71,15 @@ var Sprint = React.createClass({
     },
     render: function() {
 	var that = this;
-	var activeSprint = this.state.data.filter(function(d, i) {
-	   return d.Id === that.state.currentSprintId;
-	})[0];
-	var sprintShown = activeSprint.Teams.filter(function(d, i) {
-	   return d.Id === that.state.currentTeamId;
+	var currentTeamId = that.state.currentTeamId;
+	var sprintShown = this.state.stories.Teams.filter(function(d, i) {
+	   return d.Id === currentTeamId;
 	})[0];
 	var storyNodes = sprintShown.Stories.map(function(story, i) {
 	    return(
-		<div>
+		<div className="story-node">
 		<Story
-		storyName={story.name}
+		data={sprintShown.Stories[i]}
 		index={i}
 		handleChange={that.handleChange}
 		showUpButton={that.shouldShowUp(i)}
@@ -94,8 +93,12 @@ var Sprint = React.createClass({
 	});
 	return (
 	    <div className='sprint'>
+	    <div className='select-sprint-button-block'>
 	    {that.elementSprintTeamButtons()}
-	    <div className='story-add button' onClick={this.addNewStory} />	    
+	    </div>
+	    <div className='sprint add button' onClick={this.addNewStory}>
+	    +
+	    </div>
 	    {storyNodes}
 	</div>
 	);
@@ -171,21 +174,29 @@ var Story = React.createClass({
     elementMoveButtons: function() {
 	if (this.props.showUpButton && this.props.showDownButton) {
 	    return (
-		<div className="story-buttons">
-		<div className='move-up button' onClick={this.props.onHandleMoveUp} />
-		<div className='move-down button' onClick={this.props.onHandleMoveDown} />
+		<div className="story-buttons move-buttons">
+		<div className='move-up button' onClick={this.props.onHandleMoveUp}>
+		^
+		</div>
+		<div className='move-down button' onClick={this.props.onHandleMoveDown}>
+		v
+		</div>
 		</div>
 	    );
 	} else if (this.props.showUpButton) {
 	    return (
-		<div className="story-buttons">
-		<div className='move-up button' onClick={this.props.onHandleMoveUp} />
+		<div className="story-buttons move-buttons">
+		<div className='move-up button' onClick={this.props.onHandleMoveUp}>
+		^
+		</div>
 		</div>
 	    );
 	} else if (this.props.showDownButton) {
 	    return (
-		<div className="story-buttons">
-		<div className='move-down button' onClick={this.props.onHandleMoveDown} />
+		<div className="story-buttons move-buttons">
+		<div className='move-down button' onClick={this.props.onHandleMoveDown}>
+		v
+		</div>
 		</div>
 	    );	    
 	}
@@ -217,14 +228,30 @@ var Story = React.createClass({
 	});
 	return (
 	    <div className="story">
-	    {this.elementMoveButtons()}
-	    <input
-	    value={this.props.storyName}
-	    onChange={function(e) {that.props.handleChange(e, that.props.index)}}
-	    />
-	    <div className='delete button' onClick={this.props.onDelete} />
-	    {taskNodes}
-	    <div className='add-task button' onClick={this.addNewTask} />
+	      <div className='story-header-block'>
+	    <div className="story-item-block">
+	    <div className="story-label">
+	          Story Name:
+	        </div>
+	          <input className="story-name"
+	            value={this.props.storyName}
+	            onChange={function(e) {that.props.handleChange(e, that.props.index)}}
+	          />
+	          <div className="story-button-block">
+	            <div className='story delete button' onClick={this.props.onDelete}>
+	              x
+	            </div>
+	            {this.elementMoveButtons()}
+	    <div className='story add button' onClick={this.addNewTask}>
+	    +
+	    </div>
+	          </div>
+	        </div>
+	      </div>
+	      <div className="task-block">
+	        {taskNodes}
+	      </div>
+
 	    </div>
 	);
     }
@@ -240,21 +267,29 @@ var TaskItem = React.createClass({
 	console.log(this.props);
 	if (this.props.showUpButton && this.props.showDownButton) {
 	    return (
-		<div className="task-buttons">
-		<div className='move-up button' onClick={this.props.onHandleMoveUp} />
-		<div className='move-down button' onClick={this.props.onHandleMoveDown} />
+		<div className="task-buttons move-buttons">
+		<div className='move-up button' onClick={this.props.onHandleMoveUp}>
+		^
+		</div>
+		<div className='move-down button' onClick={this.props.onHandleMoveDown}>
+		v
+		</div>
 		</div>
 	    );
 	} else if (this.props.showUpButton) {
 	    return (
-		<div className="task-buttons">
-		<div className='move-up button' onClick={this.props.onHandleMoveUp} />
+		<div className="task-buttons move-buttons">
+		<div className='move-up button' onClick={this.props.onHandleMoveUp}>
+		^
+		</div>
 		</div>
 	    );
 	} else if (this.props.showDownButton) {
 	    return (
-		<div className="task-buttons">
-		<div className='move-down button' onClick={this.props.onHandleMoveDown} />
+		<div className="task-buttons move-buttons">
+		<div className='move-down button' onClick={this.props.onHandleMoveDown}>
+		v
+		</div>
 		</div>
 	    );	    
 	}
@@ -263,7 +298,7 @@ var TaskItem = React.createClass({
 	var that = this;
 	return (
 	    <div className="task-item">
-	    {this.elementMoveButtons()}
+	    <div className='task-input-block'>
   	    <TaskName
 	    index={this.props.index}
 	    taskName={that.props.taskName}
@@ -286,7 +321,13 @@ var TaskItem = React.createClass({
 	    taskNotes={that.props.taskNotes}
 	    handleChangeNotes={that.props.handleCHangeNotes}
 	    />
-	    <div className="delete button" onClick={this.props.onDelete} />
+	    </div>
+	    <div className="task-button-block">
+	    <div className="task delete button" onClick={this.props.onDelete}>
+	    x
+	    </div>
+	    {this.elementMoveButtons()}
+	    </div>
 	    </div>
 	);
     }
@@ -307,7 +348,7 @@ var TaskName = React.createClass({
 	var that = this;
 	var taskName = this.props.taskName;
 	return (
-	    <input ref="taskName" value={taskName} onChange={function(e) {that.props.handleChangeName(e, that.props.index)}} />
+	    <input className="task task-name" ref="taskName" value={taskName} onChange={function(e) {that.props.handleChangeName(e, that.props.index)}} />
 	);
     }
 });
@@ -338,9 +379,9 @@ var TaskPts = React.createClass({
 	var taskPtsRemain = this.props.taskPtsRemain;
 	var that = this;
 	return (
-	    <div>
-	      <input ref="taskPtsTotal" value={taskPtsTotal} onChange={function(e) {that.props.handleChangeTotal(e, that.props.index)}} />	    
-	      <input ref="taskPtsRemain" value={taskPtsRemain} onChange={function(e) {that.props.handleChangeRemain(e, that.props.index)}} />
+	    <div className="task task-pts">
+	      <input className="task task-pts-tot" ref="taskPtsTotal" value={taskPtsTotal} onChange={function(e) {that.props.handleChangeTotal(e, that.props.index)}} />	    
+	      <input className="task task-pts-rem" ref="taskPtsRemain" value={taskPtsRemain} onChange={function(e) {that.props.handleChangeRemain(e, that.props.index)}} />
 	    </div>
 	);
     }
@@ -361,7 +402,7 @@ var TaskUser = React.createClass({
 	var taskUser = this.state.taskUser;
 	var that = this;
 	return (
-	    <input ref="taskUser" value={taskUser} onChange={function(e) {that.props.handleChangeUser(e, that.props.index)}} />
+	    <input className="task task-user" ref="taskUser" value={taskUser} onChange={function(e) {that.props.handleChangeUser(e, that.props.index)}} />
 	);
     }
 });
@@ -381,13 +422,26 @@ var TaskNotes = React.createClass({
 	var taskNotes = this.state.taskNotes;
 	var that = this;
 	return (
-	    <input ref="taskNotes" value={taskNotes} onChange={function(e) {that.props.handleChangeNotes(e, that.props.index)}} />
+	    <input className="task task-notes" ref="taskNotes" value={taskNotes} onChange={function(e) {that.props.handleChangeNotes(e, that.props.index)}} />
 	);
     }
 });
 
-React.renderComponent(
-    <Sprint />,
-    document.getElementById('sprint-outline')
-);
+/**
+$.get("http://192.168.1.124:8080/sprints/1")
+.success(function(data) {
+    React.renderComponent(
+	<Sprint data={[data]}/>,
+	document.getElementById('sprint-outline')
+    );
+});
+**/
+var data = [{"Id":1,"Start":"20140101000000","End":"20140109000000","Teams":[{"Id":1,"Name":"Red","SprintId":"1","Stories":[{"Id":1,"Name":"Omnibox","TeamId":"1","Tasks":[{"Id":1,"Title":"","AssignedTo":{"Id":1,"Name":"Tiffany","CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"2014-10-10T01:23:33Z"},"UserId":"1","StoryId":"1","Total":"6","Remaining":"4","Status":"","CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"},{"Id":2,"Name":"Maps","TeamId":"1","Tasks":null,"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"},{"Id":2,"Name":"Blue","SprintId":"1","Stories":[{"Id":3,"Name":"Sponsors","TeamId":"2","Tasks":null,"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}],"CreatedAt":"2014-10-09T00:00:00Z","UpdatedAt":"2014-10-09T00:00:00Z"}];
+
+    React.renderComponent(
+	<Sprint data={data} />,
+	document.getElementById('sprint-outline'));
+
+
+
 

@@ -1,8 +1,53 @@
 .button {
+    display: inline-block;
     width: 100px;
     height: 30px;
     border: 1px solid #8DC0EC;
     background-color: #58B8E4;
+    transition: 0.5;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 5px;
+}
+
+.button:hover {
+    cursor: pointer;
+    background-color: #58b8ff;
+    transition: 0.5s;
+}
+
+.button.story-buttons {
+    position: relative;
+}
+
+.button.move-up {
+    display: block;
+    width: 30px;
+    padding-top: 8px;
+    height: 25px;
+}
+
+.button.move-down {
+    display: block;
+    width: 30px;
+    padding-top: 6px;
+    height: 28px;
+}
+
+.button.delete {
+    width: 30px;
+    padding-top: 8px;
+    height: 25px;
+}
+
+.button.add {
+    width: 30px;
+    padding-top: 8px;
+    height: 25px;
+}
+
+.story-buttons, .task-buttons {
+    display: inline-block;
 }
 
 input {
@@ -16,4 +61,117 @@ input {
     border: 1px solid #bbb;
     font-size: 14px;
     outline: 0;
+}
+
+.task-item {
+    position: relative;
+    display: block;
+    margin: 10 auto;
+    height: 72px;
+}
+
+.task {
+    display: inline-block;
+}
+.sprint {
+    position: relative;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.task-input-block {
+    vertical-align: top;
+    display: inline-block;
+    top: 50%;
+    transform: translateY(-50%);
+    position: relative;
+}
+
+.task-button-block, .story-button-block {
+    vertical-align: top;
+    display: inline-block;
+    padding-left: 10px;
+}
+
+.task.button.delete {
+    vertical-align: top;
+    display: inline-block;
+    top: 36px;
+    transform: translateY(-50%);
+    position: relative;
+}
+
+.move-buttons {
+    padding-left: 10px;
+    vertical-align: top;
+    display: inline-block;
+    position: relative;
+    top: 36px;
+    transform: translateY(-50%);
+}
+
+.story {
+    margin: 10px;
+}
+
+.select-sprint-button-block {
+}
+
+.story-name {
+    float: left;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-block;
+    vertical-align: top;
+}
+
+.story-item-block {
+    position: relative;
+    display: block;
+    margin: 10 auto;
+    height: 72px;
+}
+
+.story-label {
+    padding-right: 10px;
+    float: left;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-block;
+    vertical-align: top;
+}
+
+.story-button-block {
+    float: left;
+    display: inline-block;
+}
+
+.story.add.button {
+    margin: 0 auto;
+    margin-left: 10px;
+    vertical-align: top;
+    display: inline-block;
+    top: 36px;
+    transform: translateY(-50%);
+    position: relative;
+}
+
+.story.delete.button {
+    margin: 0 auto;
+    vertical-align: top;
+    display: inline-block;
+    top: 36px;
+    transform: translateY(-50%);
+    position: relative;
+}
+
+.select-sprint-button-block {
+    margin: 10 auto;
+}
+
+.select-team.button {
+    margin-left: 10px;
 }

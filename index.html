@@ -6,6 +6,11 @@
   <div id="welcome-section"></div>
   <div id="sprint-outline"></div>
 
-<script src="build/index.js"></script>
+  <script src="build/index.js"></script>
+  <script>
+    [].forEach.call($$("*"),function(a){
+  a.style.outline="1px solid #"+(~~(Math.random()*(1<<24))).toString(16)
+							})
+							</script>
 </body>
 </html>
