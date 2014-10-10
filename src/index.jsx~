@@ -1,0 +1,114 @@
+/** @jsx React.DOM **/
+var React = require('react');
+
+/** fake data model **/
+var tasks = [
+    {'name': 'add unittests', 'user': 'bob'},
+    {'name': 'rewrite php part', 'user': 'bob'}
+];
+
+var HelloMessage = React.createClass({
+    render: function() {
+	return <div>Hello, {this.props.name}!</div>;
+    }
+});
+
+var Task = React.createClass({
+    getInitialState: function() {
+	return (
+	    {taskName: ''}
+	);
+    },
+    handleChange: function(e) {
+	this.setState({taskName: e.target.value});
+    },
+    render: function() {
+	return (
+	    <div class="task">
+              <input value={this.state.taskName} onChange={this.handleChange} />
+            </div>
+	);
+    }
+});
+
+/**
+var TaskList = React.createClass({
+    render: function() {
+	var taskNodes = this.props.data.map(function(task) {
+	    return (
+		<Task />
+	    );
+	});
+	return (
+	    <div class="task-list">
+	      {taskNodes}
+	    </div>
+	);
+    }
+});
+**/
+
+var Story = React.createClass({
+    getInitialState: function() {
+	return {data: []};
+    },
+    render: function() {
+	return (
+	    <div class="story">
+	      <h1>Current story: {this.props.name}</h1>
+	      <TaskList data={this.state.data}/>
+	    </div>
+	);     
+    }
+});
+
+
+
+
+
+/**
+var App = React.createClass({
+    getInitialState: function() {
+      return {userInput: ''};
+    },
+    handleChange: function(e) {
+      this.setState({userInput: e.target.value});
+    },
+    clearAndFocusInput: function() {
+      this.setState({userInput: ''}); // Clear the input
+      // We wish to focus the <input /> now!
+      this.refs.theInput.getDOMNode().focus();
+    },
+    render: function() {
+      return (
+        <div>
+          <div onClick={this.clearAndFocusInput}>
+            Click to Focus and Reset
+          </div>
+          <input
+	    ref="theInput"
+            value={this.state.userInput}
+            onChange={this.handleChange}
+          />
+        </div>
+      );
+    }
+  });
+**/
+
+/**
+React.renderComponent(
+    <HelloMessage name="John"/>,
+    document.getElementById("welcome-section")
+);
+
+React.renderComponent(
+    <Story name="Test" data={tasks} />,
+    document.getElementById("sprint-outline")
+);
+**/
+
+React.renderComponent(
+    <Task />,
+    document.getElementById("app")
+);

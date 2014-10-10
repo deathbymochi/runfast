@@ -1,0 +1,19 @@
+.button {
+    width: 100px;
+    height: 30px;
+    border: 1px solid #8DC0EC;
+    background-color: #58B8E4;
+}
+
+input {
+    margin: 0;
+    border: 0;
+    padding: 20px;
+
+    width: 150px;
+    height: 30px;
+
+    border: 1px solid #bbb;
+    font-size: 14px;
+    outline: 0;
+}
